@@ -33,7 +33,7 @@ CORS(app)
 
 sensor_data = None
 sensor_queue = Queue(maxsize=1)
-sensor = Radio(sensor_queue=sensor_queue)
+radio = Radio(sensor_queue=sensor_queue)
 
 
 @app.route('/sensor', methods=['POST'])
@@ -47,5 +47,5 @@ def sensor():
 
 
 if __name__ == '__main__':
-    sensor.start()
+    radio.start()
     app.run(port=8081, host='0.0.0.0')
