@@ -88,25 +88,24 @@ class Radio(threading.Thread):
     def run(self) -> None:
 
         while not self.stop:
-            packet = None
             # draw a box to clear the image
             self.display.fill(0)
             self.display.text('BME 280 Sensor', 0, 0, 1)
 
             # check for packet rx
             self.current_packet = self.rfm9x.receive()
-            if packet is None or self.previous_packet:
+            if self.current_packet is None or self.previous_packet:
                 self.display.show()
                 self.display.text('- Waiting for PKT -', 10, 20, 1)
                 logger.debug("waiting for packet...")
             else:
-                self.previous_packet = packet
+                self.previous_packet = self.current_packet
 
-                temp_val = self.int_to_float(packet[1], packet[2])
-                humid_val = self.int_to_float(packet[3], packet[4])
-                pres_val = self.int_to_float(packet[5], packet[6], packet[7])
+                temp_val = self.int_to_float(self.current_packet[1], self.current_packet[2])
+                humid_val = self.int_to_float(self.current_packet[3], self.current_packet[4])
+                pres_val = self.int_to_float(self.current_packet[5], self.current_packet[6], self.current_packet[7])
 
-                sensor_data = SensorData(device_id=packet[0], temperature=temp_val, humidity=humid_val,
+                sensor_data = SensorData(device_id=self.current_packet[0], temperature=temp_val, humidity=humid_val,
                                          pressure=pres_val)
                 logger.debug("recieved packet: %s", sensor_data)
                 time.sleep(1)
