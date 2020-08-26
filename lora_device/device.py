@@ -21,20 +21,22 @@ logger = logging.getLogger().getChild(__name__)
 
 
 class SensorData:
-    def __init__(self, device_id, temperature, humidity, pressure):
+    def __init__(self, device_id, celcius, humidity, pressure):
         self.device_id = device_id
-        self.temperature = temperature
+        self.fahrenheit= (celcius * (9/5)) + 32
         self.humidity = humidity
         self.pressure = pressure
-
+        self.celcius = celcius
+        #(0°C × 9/5) + 32 
     def to_json(self):
-        json_dict = {'device_id': self.device_id, 'temperature': self.temperature, 'humidity': self.humidity,
+        json_dict = {'device_id': self.device_id, 'fahrenheit': self.fahrenheit, 'celcius': self.celcius, 'humidity': self.humidity,
                      'pressure': self.pressure}
-        return json.loads(json_dict)
+        string = json.dumps(json_dict)
+        return json.loads(string)
 
     def __repr__(self):
-        return "SensorData(<device_id=%s, temperature=%s, humidity=%s, pressure=%s>)" % (
-            self.device_id, self.temperature, self.humidity, self.pressure)
+        return "SensorData(<device_id=%s, fahrenheit=%s, celcius=%s, humidity=%s, pressure=%s>)" % (
+            self.device_id, self.fahrenheit, self.celcius, self.humidity, self.pressure)
 
 
 class Radio(threading.Thread):
@@ -88,24 +90,24 @@ class Radio(threading.Thread):
     def run(self) -> None:
 
         while not self.stop:
+            self.current_packet = None
             # draw a box to clear the image
             self.display.fill(0)
             self.display.text('BME 280 Sensor', 0, 0, 1)
 
             # check for packet rx
             self.current_packet = self.rfm9x.receive()
-            if self.current_packet is None or self.previous_packet:
+            if self.current_packet is None:
                 self.display.show()
                 self.display.text('- Waiting for PKT -', 10, 20, 1)
                 logger.debug("waiting for packet...")
-            else:
-                self.previous_packet = self.current_packet
+            else: 
 
                 temp_val = self.int_to_float(self.current_packet[1], self.current_packet[2])
                 humid_val = self.int_to_float(self.current_packet[3], self.current_packet[4])
                 pres_val = self.int_to_float(self.current_packet[5], self.current_packet[6], self.current_packet[7])
 
-                sensor_data = SensorData(device_id=self.current_packet[0], temperature=temp_val, humidity=humid_val,
+                sensor_data = SensorData(device_id=self.current_packet[0], celcius=temp_val, humidity=humid_val,
                                          pressure=pres_val)
                 logger.debug("recieved packet: %s", sensor_data)
                 time.sleep(1)

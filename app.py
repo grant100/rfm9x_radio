@@ -36,7 +36,7 @@ sensor_queue = Queue(maxsize=1)
 radio = Radio(sensor_queue=sensor_queue)
 
 
-@app.route('/sensor', methods=['POST'])
+@app.route('/sensor', methods=['POST','GET'])
 def sensor():
     try:
         sensor_data = sensor_queue.get(timeout=5)

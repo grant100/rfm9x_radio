@@ -1,0 +1,14 @@
+[Unit]
+Description=RFM9x LoRa Radio
+After=network.target
+
+[Service]
+ExecStart=/home/pi/code/rfm9x_radio/env/bin/python3 -u app.py
+WorkingDirectory=/home/pi/code/rfm9x_radio/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
