@@ -47,5 +47,6 @@ def sensor():
 
 
 if __name__ == '__main__':
+    radio.daemon = True
     radio.start()
     app.run(port=8081, host='0.0.0.0')

@@ -98,6 +98,7 @@ class Radio(threading.Thread):
             if packet is None or self.previous_packet:
                 self.display.show()
                 self.display.text('- Waiting for PKT -', 10, 20, 1)
+                logger.debug("waiting for packet...")
             else:
                 self.previous_packet = packet
 
